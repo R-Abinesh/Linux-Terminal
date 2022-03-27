@@ -120,6 +120,35 @@ void rem_dir(string s)
 		perror("Failed to remove directory :");
 }
 
+void cat(string param){
+	char s[1024];
+	string first,second;
+	str_par(param,first,second);
+	while(second!=""){
+		FILE *fptr = fopen(first.data(),"r");
+		if(!fptr){
+			perror("");
+			return ;
+		}
+		cout<<first<<endl;
+		while(fgets(s,1024,fptr)){
+			cout<<s;	
+		}
+		cout<<"-------------------------------------------------------------------------------"<<endl<<endl;
+		str_par(second,first,second);
+	}
+	cout<<first<<endl;
+	FILE *fptr = fopen(first.data(),"r");
+	if(!fptr){
+		perror("");
+		return;
+	}
+	while(fgets(s,1024,fptr))
+		cout<<s;
+
+
+}
+
 
 int main(){
 	chdir(getenv("HOME"));
@@ -179,6 +208,10 @@ int main(){
 
 			else if(cmd == "rmdir"){
 				rem_dir(dir);
+			}
+
+			else if(cmd == "cat"){
+				cat(param);
 			}
 			
 			else if(s!="exit"){
