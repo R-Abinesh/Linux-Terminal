@@ -3,6 +3,7 @@
 #include<vector>
 #include<unistd.h>
 #include<cstring>
+#include<sstream>
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<dirent.h>
@@ -22,6 +23,19 @@ void hstcmd(vector<string>hst,int i){
 }
 
 void str_par(string s, string &cmd, string &param, char delimiter=' '){
+	
+/*DEMO 
+	stringstream ss(s);
+	string word;
+	while(ss>>word){
+		cout<<word<<endl;
+
+	}
+DEMO END
+*/
+
+
+
 	int start = 0;
 	int end = s.find(delimiter);
 	cmd = s.substr(start,end);
@@ -33,6 +47,7 @@ void str_par(string s, string &cmd, string &param, char delimiter=' '){
 	
 	start = end+1;
 	param = s.substr(start,s.size());
+
 }
 
 
@@ -81,11 +96,68 @@ void list(string param)
 
 }
 
+int isDir(string dir_name){
+	DIR *directory = opendir(dir_name.data());
+	if(directory != NULL){
+		//cout<<"Directory"<<endl;
+		return 0;
+	}
+	else if(errno == ENOTDIR){
+		//cout<<"Normal file"<<endl;
+		return 1;
+	}
+	else{
+		return -1;
+	}
+}
+
+void ch_dir(const char* dir)
+{       int ret = chdir(dir);
+        if(ret)
+                perror("Cannot move to the directory ");
+}
+
+
+void finder(const char* cur_dir,string f_name){
+	ch_dir(cur_dir);
+	DIR *dStream = opendir(cur_dir);
+	struct dirent *entry;
+	if(dStream != NULL){
+		while((entry = readdir(dStream))!=NULL){
+			if(entry->d_name[0]=='.'){
+				continue;
+			}
+			else if (isDir(entry->d_name)==0){ 
+				if(entry->d_name == f_name){
+					cout<<cur_dir<<"/"<<f_name<<" is a folder"<<endl;
+					break;
+				}
+				string newDir = (string)cur_dir+"/"+entry->d_name;
+				finder(newDir.data(),f_name);
+				ch_dir("..");		
+			}
+		
+			//else if(isDir(entry->d_name) == 1){
+			else{
+			       	if(entry->d_name == f_name){
+					cout<<cur_dir<<"/"<<f_name<<endl;
+					break ;
+				}
+			}
+		//	else if(isDir(entry->d_name)== -1){
+		//		break;
+		//	}
+			
+		}
+	}
+	closedir(dStream);
+}
+/*
 void ch_dir(const char* dir)
 {       int ret = chdir(dir);
 	if(ret)
 		perror("Cannot move to the directory ");
-}
+}*/
 
 void make_dir(string s, mode_t mode= 0777)
 {
@@ -198,6 +270,11 @@ int main(){
 			if(cmd == "cd"){	 //change directory
 				ch_dir(dir);
 			}
+			else if(cmd == "find"){
+				finder(pwd,param);
+				//isDir(param);
+				//cout<<param<<endl;
+			}
 			else if(cmd == "pwd"){   //current working directory
 				cout<<pwd<<endl;
 			}
@@ -214,7 +291,7 @@ int main(){
 				cat(param);
 			}
 			
-			else if(s!="exit"){
+			else{
 				cout<<s<<" :Command not found"<<endl;
 			}
 
