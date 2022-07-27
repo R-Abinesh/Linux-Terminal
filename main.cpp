@@ -192,6 +192,15 @@ void rem_dir(string s)
 		perror("Failed to remove directory :");
 }
 
+void run(string bin_exec_file){
+	string path="/bin/"+bin_exec_file;
+	int ret;
+	ret = execl(path.data(),bin_exec_file.data(),NULL);
+	if(ret)
+		perror("");
+	
+}
+
 void cat(string param){
 	char s[1024];
 	string first,second;
@@ -285,6 +294,10 @@ int main(){
 
 			else if(cmd == "rmdir"){
 				rem_dir(dir);
+			}
+
+			else if(cmd=="run"){
+				run(dir);
 			}
 
 			else if(cmd == "cat"){
