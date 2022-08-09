@@ -50,3 +50,6 @@ _readdir() returns details of every file and folder(called entries) in the direc
 			unsigned char d_type; 	 /* type of file */
 			char d_name[256]; 		 /* filename */
 	    };
+
+### run command
+The applications can be opened from the terminal using the fork() and execv() system call. The fork() system call creates a new child process, followed by execv() system call which puts the process image/binary executable file into the process stack of child process and it gets running.

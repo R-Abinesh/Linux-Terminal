@@ -7,6 +7,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<dirent.h>
+#include<signal.h>
 
 using namespace std;
 
@@ -193,12 +194,19 @@ void rem_dir(string s)
 }
 
 void run(string bin_exec_file){
-	string path="/bin/"+bin_exec_file;
-	int ret;
-	ret = execl(path.data(),bin_exec_file.data(),NULL);
-	if(ret)
-		perror("");
-	
+	pid_t pid;
+	pid = fork();
+	if(!pid){
+		cout<<"inside run: "<<getpid()<<endl;
+		string path="/bin/"+bin_exec_file;
+		int ret;
+		ret = execl(path.data(),bin_exec_file.data(),NULL);
+		cout<<"after execl call "<<getpid()<<endl;
+		if(ret)
+			perror("");
+		kill(getpid(),SIGSEGV);
+	}
+	cout<<"after child condition "<<getpid()<<endl;
 }
 
 void cat(string param){
@@ -297,7 +305,9 @@ int main(){
 			}
 
 			else if(cmd=="run"){
+				cout<<"inside main :"<<getpid()<<endl;
 				run(dir);
+				cout<<"after run call() "<<getpid()<<endl;
 			}
 
 			else if(cmd == "cat"){
